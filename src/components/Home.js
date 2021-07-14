@@ -1,47 +1,46 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import apiClient from '../services/apiClient';
+import bookingDialogService from '../services/bookingDialogService';
+
+//https://run.mocky.io/v3/62de12a6-dce1-4b9c-a34c-c77e275df98a
 
 const Home = () => {
 
     const [homesState, setHomesState] = useState([]);
 
     useEffect(() => {
-        const homesDataPromise = Promise.resolve([
-            {
-                title: 'Test home 1',
-                image: 'listing.jpg',
-                location: 'Test location 1',
-                price: '1'
-            },
-            {
-                title: 'Test home 2',
-                image: 'listing.jpg',
-                location: 'Test location 2',
-                price: '2'
-            },
-            {
-                title: 'Test home 3',
-                image: 'listing.jpg',
-                location: 'Test location 3',
-                price: '3'
-            },
-        ]);
 
-        homesDataPromise.then((homesData) => {
-            setHomesState(homesData);
-        })
+        const homesDataPromise = apiClient.getHomes();
+
+        homesDataPromise.then((homesData) => setHomesState(homesData));
+        console.log(homesDataPromise);
+
     }, [])
 
     let homes;
 
     homes = homesState.map((home, index) => {
         return(
-            <div data-testid="home" key={index}>Something</div>
+            <div data-testid="home" key={index} className="shadow-md rounded">
+                <img src="https://images.adsttc.com/media/images/5ecd/d4ac/b357/65c6/7300/009d/large_jpg/02C.jpg?1590547607" alt="" data-testid="home-image"/>
+                <div className="flex flex-col gap-2 p-1">
+                    <div data-testid="home-title" className="font-semibold">{home.title}</div>
+                    <p data-testid="home-location">{home.location}</p>
+                    <p data-testid="home-price">${home.price}</p>
+                    <button 
+                         data-testid="home-booking-btn"
+                         className="p-1 text-white bg-blue-500 rounded"
+                         onClick={() => bookingDialogService.open(home)}>
+                         Book
+                    </button>
+                </div>
+            </div>
         )
     })
 
 
     return (
-        <div>
+        <div className="container mx-auto my-4 flex justify-between items-center gap-3">
            {homes}
         </div>
     )
