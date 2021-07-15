@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../services/apiClient';
 import bookingDialogService from '../services/bookingDialogService';
+import {Dialog, DialogContent} from '@material-ui/core';
+import HomeBooking from './HomeBooking';
 
 //https://run.mocky.io/v3/62de12a6-dce1-4b9c-a34c-c77e275df98a
 
@@ -13,9 +15,14 @@ const Home = () => {
         const homesDataPromise = apiClient.getHomes();
 
         homesDataPromise.then((homesData) => setHomesState(homesData));
-        console.log(homesDataPromise);
+        
+        const subscription = bookingDialogService.events$.subscribe(state => setBookingDialogState(state));
 
-    }, [])
+        return () => subscription.unsubscribe();
+
+    }, []);
+
+    const [bookingDialogState, setBookingDialogState] = useState({ open:false });
 
     let homes;
 
@@ -40,9 +47,20 @@ const Home = () => {
 
 
     return (
-        <div className="container mx-auto my-4 flex justify-between items-center gap-3">
-           {homes}
-        </div>
+        <>
+            <div className="container mx-auto my-4 flex justify-between items-center gap-3">
+            {homes}
+            </div>
+            <Dialog
+                maxWidth="xs"
+                fullWidth={true} 
+                open={bookingDialogState.open}
+                onClose={() => bookingDialogService.close()}>
+                <DialogContent>
+                  <HomeBooking home={bookingDialogState.home}/>
+                </DialogContent>
+            </Dialog>
+        </>
     )
 }
 
